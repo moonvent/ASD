@@ -149,7 +149,7 @@ class MyApp(App):
             value = ti.text
             ti.text = ''
             ti.hint_text_color = [1, 0, 1, 1]
-            ti.hint_text = 'Число принято, введите новое:'
+            ti.hint_text = 'Число принято,\nвведите новое:'
 
             if self.root_of_tree.find_node(int(value)) is True:    # повторное значения - фи
                 return
@@ -211,10 +211,12 @@ class MyApp(App):
             value = ti1.text
             ti1.text = ''
             ti1.hint_text_color = [1, 0, 1, 1]
-            ti1.hint_text = 'Число принято, элемент удален.'
+            ti1.font_size = 16
+            ti1.hint_text = 'Число принято,\nэлемент удален.'
             if self.root_of_tree.remove_node(int(value), None) is False:
                 ti1.hint_text_color = [1, 0, 0, 1]
-                ti1.hint_text = 'Нельзя удалить корень, или узел у которого НЕ один дочерний элемент.'
+                ti1.font_size = 12
+                ti1.hint_text = 'Нельзя удалить корень,или узел\nу которого НЕТ дочернего.'
                 return
 
             bl_for_tree.clear_widgets()     # чистим вывод для дерева
@@ -259,7 +261,7 @@ class MyApp(App):
 
         bl = BoxLayout(orientation='vertical')      # главный лайаут, верх - дерево, низ - контрол
         control_bl = BoxLayout(orientation='horizontal',    # управляющий лайаут, (кнопки управления тута)
-                               size_hint=(1, .06))
+                               size_hint=(1, .08))
         bl.add_widget(bl_for_tree)
         ti = TextInput(hint_text='Введите элемент:',
                        multiline=False,     # для рабочего энтера
