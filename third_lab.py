@@ -4,6 +4,7 @@ from kivy.config import Config
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
+from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.treeview import TreeView, TreeViewLabel
 
@@ -46,14 +47,40 @@ class BinaryTree:
             # print(self.value, 'max')
             result = str(self.value)
 
-    def pre_order(self):
-        print(self.value)     # вывод всего дерева, не нужно для фраемворка
+    def pre_order(self, ls):    # Предварительный обход (сверху вниз)
+        # print(self.value)     # вывод всего дерева, не нужно для фраемворка
+        ls.append(self.value)
 
         if self.left_child:
-            self.left_child.pre_order()
+            self.left_child.pre_order(ls)
 
         if self.right_child:
-            self.right_child.pre_order()
+            self.right_child.pre_order(ls)
+
+        return ls
+
+    def in_order(self, ls):     # симметричный обход (снизу вверх)
+        if self.left_child:
+            self.left_child.in_order(ls)
+
+        ls.append(self.value)
+        # print(self.value)
+
+        if self.right_child:
+            self.right_child.in_order(ls)
+
+        return ls
+
+    def post_order(self, ls):       # обход в обратном порядке (с низу вверх по рядам)
+        if self.left_child:
+            self.left_child.post_order(ls)
+
+        if self.right_child:
+            self.right_child.post_order(ls)
+
+        ls.append(self.value)
+        # print(self.value)
+        return ls
 
     def remove_node(self, value, parent):   # удаление узла, с присвоение к его перенту его чайлдов
         if value < self.value and self.left_child:
@@ -126,6 +153,9 @@ class MyApp(App):
     dict_of_nodes = {}  # запись узлов в словарь для рисования
     temp_var1 = 0   # переменные для рисования)
     temp_var2 = 0
+    dot.node('1', "", style='invis')
+    temp_var3 = '0'
+    vihod = False
 
     img = Image(source='C:\\PyProj\\ASD\\test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
 
@@ -138,7 +168,7 @@ class MyApp(App):
         def add(instance):  # функция на добавление элемента в дерево, рисунок
 
             try:       # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
-                int(ti.text)    # работаем с инт , если что менять тут и в TextInput
+                float(ti.text)    # работаем с инт , если что менять тут и в TextInput
             except ValueError:
                 ti.text = ''
                 ti.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
@@ -146,49 +176,59 @@ class MyApp(App):
                 return
 
             # чистим текст лайаут
-            value = ti.text
+            value = float(ti.text)
             ti.text = ''
             ti.hint_text_color = [1, 0, 1, 1]
             ti.hint_text = 'Число принято,\nвведите новое:'
 
-            if self.root_of_tree.find_node(int(value)) is True:    # повторное значения - фи
-                return
+            print(value)
+
+            # if self.root_of_tree.find_node(value) is True:    # повторное значения - фи
+            #     return
 
             if self.root_of_tree.value == 0:    # если корня нет
-                self.root_of_tree = BinaryTree(int(value))
+                self.root_of_tree = BinaryTree(value)
                 return
             else:
-                self.root_of_tree.insert_node(int(value))   # вставляем в дерево новый узел
+                self.root_of_tree.insert_node(value)   # вставляем в дерево новый узел
 
                 if result not in self.dict_of_nodes.values():   # в словарь добавляем значение ноды (value), и её клуч (counter)
                     self.counter += 1
                     code = reformat(self.counter)
-                    self.dict_of_nodes.update({code: result})
+                    self.dict_of_nodes.update({code: str(result)})
                     self.temp_var1 = code  # вводим в временную переменную ключ, для вывода графа
                 else:
                     for i, j in self.dict_of_nodes.items(): # если же всё таки родитель есть, что скорее всего, просто находим его и берем его клуч
                         if result == j:
                             self.temp_var1 = i
 
-                self.dot.node(self.temp_var1, result)  # добавляем ноду родителя в граф, или же если она была просто конектим её
+                self.dot.node(self.temp_var1, str(result))  # добавляем ноду родителя в граф, или же если она была просто конектим её
 
                 if ti.text not in self.dict_of_nodes.values():  # если нет дочернего в словаре, добавляем его, по аналогии с перентом
                     self.counter += 1
                     code = reformat(self.counter)
-                    self.dict_of_nodes.update({code: value})
+                    self.dict_of_nodes.update({code: str(value)})
                     self.temp_var2 = code
                 else:
                     for i, j in self.dict_of_nodes.items():
                         if result == j:
                             self.temp_var2 = i
 
-                self.dot.node(self.temp_var2, value)
-
+                self.dot.node(self.temp_var2, str(value))
+                # print(self.dict_of_nodes)
                 rebro = self.temp_var1 + self.temp_var2   # код ребра, обычно просто 2 символа - 12 - первый узел со вторым, это же и ребро
                 # print(rebro)
                 self.dot.edges([rebro])  # рисуем ребра
+                # print(self.temp_var3, rebro[:1])
+                if self.temp_var3 != rebro[:1]:
+                    self.temp_var3 = rebro[:1]
+                    self.dot.edge(rebro[:1], "1", style='invis')
+                else:
+                    self.dot.body.remove('\t' + rebro[:1] + ' -- 1 [style=invis]')
+                # print(self.dot.body)
 
             bl_for_tree.clear_widgets()     # при успешном добавлении чистим изображние
+            print(self.dict_of_nodes)
 
             self.dot.render('test-output/round-table.gv')   # выводим граф в файл, расширение - выше, путь - папка test-output
 
@@ -201,7 +241,7 @@ class MyApp(App):
         def task(instance):
 
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
-                int(ti1.text)  # работаем с инт , если что менять тут и в TextInput
+                float(ti1.text)  # работаем с инт , если что менять тут и в TextInput
             except ValueError:
                 ti1.text = ''
                 ti1.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
@@ -213,7 +253,7 @@ class MyApp(App):
             ti1.hint_text_color = [1, 0, 1, 1]
             ti1.font_size = 16
             ti1.hint_text = 'Число принято,\nэлемент удален.'
-            if self.root_of_tree.remove_node(int(value), None) is False:
+            if self.root_of_tree.remove_node(float(value), None) is False:
                 ti1.hint_text_color = [1, 0, 0, 1]
                 ti1.font_size = 12
                 ti1.hint_text = 'Нельзя удалить корень,или узел\nу которого НЕТ дочернего.'
@@ -260,27 +300,51 @@ class MyApp(App):
         # РАБОЧАЯ СРЕДА (лайауты)
 
         bl = BoxLayout(orientation='vertical')      # главный лайаут, верх - дерево, низ - контрол
-        control_bl = BoxLayout(orientation='horizontal',    # управляющий лайаут, (кнопки управления тута)
-                               size_hint=(1, .08))
+        bl_full_control = BoxLayout(orientation='vertical',
+                                    size_hint=(1, .2))
+        control_bl = BoxLayout(orientation='horizontal',  # управляющий лайаут, (добавить элемент/задача)
+                               size_hint=(1, .1))
+        order_bl = BoxLayout(orientation='horizontal',  # часть за обходы дерева
+                             size_hint=(1, .1))
+        bl_full_control.add_widget(control_bl)
+        bl_full_control.add_widget(order_bl)
+        label = Label(text='Тут будет результат обхода')    # сюда будут выводится результаты обхода
+        order_bl.add_widget(label)
+
+        def pre_order(instance):
+            label.text = str(self.root_of_tree.pre_order([]))
+
+        def in_order(instance):
+            label.text = str(self.root_of_tree.in_order([]))
+
+        def post_order(instance):
+            label.text = str(self.root_of_tree.post_order([]))
+
+        order_bl.add_widget(Button(text="Предв. обход",
+                                   on_press=pre_order))
+        order_bl.add_widget(Button(text="Симм. обход",
+                                   on_press=in_order))
+        order_bl.add_widget(Button(text="В обратном пор.",
+                                   on_press=post_order))
         bl.add_widget(bl_for_tree)
         ti = TextInput(hint_text='Введите элемент:',
                        multiline=False,     # для рабочего энтера
-                       input_filter='int',      # автопроверка на инт))
+                       input_filter='float',      # автопроверка на инт))
                        on_text_validate=add,    # при нажатии на энтер элемент добавляется
                        )
 
         control_bl.add_widget(ti)
         control_bl.add_widget(Button(text='Добавить',
                                      on_press=add))
-        ti1 = TextInput(hint_text='Введите элемент который хотите удалить:',
+        ti1 = TextInput(hint_text='Введите элемент который\nхотите удалить:',
                         multiline=False,     # для рабочего энтера
-                        input_filter='int',      # автопроверка на инт))
+                        input_filter='float',      # автопроверка на инт))
                         on_text_validate=task,    # при нажатии на энтер элемент добавляется
                         )
         control_bl.add_widget(ti1)
         control_bl.add_widget(Button(text='Задача',
                                      on_press=task))
-        bl.add_widget(control_bl)
+        bl.add_widget(bl_full_control)
 
         return bl
 
