@@ -153,7 +153,7 @@ class MyApp(App):
     dict_of_nodes = {}  # запись узлов в словарь для рисования
     temp_var1 = 0   # переменные для рисования)
     temp_var2 = 0
-    dot.node('1', "", style='invis')
+
     temp_var3 = '0'
     vihod = False
 
@@ -222,10 +222,14 @@ class MyApp(App):
                 # print(self.temp_var3, rebro[:1])
                 if self.temp_var3 != rebro[:1]:
                     self.temp_var3 = rebro[:1]
-                    self.dot.edge(rebro[:1], "1", style='invis')
+                    self.dot.node(str(self.counter), "", style='invis')
+                    self.dot.edge(rebro[:1], str(self.counter), style='invis')
+                    print(self.dot.body)
                 else:
-                    self.dot.body.remove('\t' + rebro[:1] + ' -- 1 [style=invis]')
-                # print(self.dot.body)
+                    for i in enumerate(self.dot.body):
+                        if i[1].find(' -- ') > -1 and i[1].find('[style=invis]') > -1:
+                            self.dot.body.pop(i[0])
+                    print(self.dot.body)
 
             bl_for_tree.clear_widgets()     # при успешном добавлении чистим изображние
             print(self.dict_of_nodes)
