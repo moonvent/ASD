@@ -34,12 +34,12 @@ class BinaryTree:
 
     def insert_node(self, value):  # добавление в дерево
         global result  # стучимся к глоабльному результату
+        result = str(self.value)  # если нашли куда вставить, берем родительсую ноду
         if value <= self.value and self.left_child:
             self.left_child.insert_node(value)
         elif value <= self.value:
             self.left_child = BinaryTree(value)
             # print(self.value, 'min')
-            result = str(self.value)  # если нашли куда вставить, берем родительсую ноду
         elif value > self.value and self.right_child:
             self.right_child.insert_node(value)
         else:
@@ -240,12 +240,9 @@ class MyApp(App):
                                 for k in enumerate(self.dot.body):
                                     if k[1].find(self.temp_var1 + ' -- ' + j[1][1:2]) > -1:
                                         self.dot.body[k[0]] = '\t' + self.temp_var1 + ' -- ' + self.temp_var2
-                                        print('Вошел')
                                         break
                                 break
                         break
-
-
 
                 self.dot.body = sorted(self.dot.body, key=self.sorts2)   # обновляем граф
 
@@ -298,38 +295,41 @@ class MyApp(App):
             bl_for_tree.clear_widgets()  # чистим вывод для дерева
             self.dot.body = sorted(self.dot.body, key=sorts)
 
+            code_of_remove_node = '0'
+            temp1 = '0'
+            temp2 = '0'
+
+            i = 0  # бегунок по списку рисовалки графа
             n = len(self.dot.body) - 1
 
-            temp = '0'
-            for i in enumerate(self.dot.body):  # находим код узла в рисовалке графов, для удаления узла по коду
-                if i[1].find('label=' + value) > -1:
-                    temp = i[1][1]
-                    break
-            i = 0  # бегунок по списку рисовалки графа
-            mark = False  # если удалили одно ребро , включаем тру и удаляем другие (если есть дочерние)
-            temp1 = '0'
             while i < n:
-                # print(self.dot.body)
-                if self.dot.body[i].find('label=' + value) > -1:  # находим сам узел, то есть код и значение и удаляем его
-                    self.dot.body.pop(i)
-                    n = len(self.dot.body)
-                    i = 0
-
-                if self.dot.body[i].find(temp + ' --') > -1 or self.dot.body[i].find('-- ' + temp) > -1:
-                    # находим все связные с удаляемым узлом ребра
-                    if mark is False:
-                        mark = True
-                        temp1 = self.dot.body[i][1]
+                if self.dot.body[i].find('label=' + value) > -1:
+                    if code_of_remove_node == '0':
+                        code_of_remove_node = self.dot.body[i][1]
+                    if code_of_remove_node != '0' and code_of_remove_node == self.dot.body[i][1]:
+                        print('Удалил', self.dot.body[i])
                         self.dot.body.pop(i)
-                        n = len(self.dot.body)
                         i = 0
-                    else:
-                        self.dot.body[i] = self.dot.body[i][:1] + temp1 + self.dot.body[i][2:]
-                        # после удаления узла привязываем его сыновей к его перенту
-                        # break
-                else:
-                    i += 1
+                        n -= 1
+                i += 1
 
+            i = 0
+
+            while i < n:
+                if self.dot.body[i].find('-- ' + code_of_remove_node) > -1:
+                    if temp1 == '0':
+                        temp1 = self.dot.body[i][1]
+                    if temp1 == self.dot.body[i][1] and temp1 != '0':
+                        self.dot.body.pop(i)
+
+                if self.dot.body[i].find(code_of_remove_node + ' --') > -1:
+                    if temp1 != '0':
+                        self.dot.body[i] = self.dot.body[i][:1] + temp1 + ' ' + self.dot.body[i][3:]
+                        # print(self.dot.body[i])
+                        # print(self.dot.body)
+                i += 1
+
+            print(self.dot.body)
             # global marks
             # if marks is True:
             #     marks = False
