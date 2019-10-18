@@ -66,14 +66,17 @@ class Graph:
             if code_of_parent != '0' and code_of_son != '0':
                 break
 
-        print(code_of_parent, code_of_son)
-        # i = 0
+        self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')   # удаляем узел удаляемого
+
+        code_of_new_son = '0'
         for i in self.g.body:
-            if i.find(code_of_son + ' --') > -1 and i.find('invis') == -1:
-                self.g.body.remove('\t' + code_of_parent + ' -- ' + code_of_son)
-                self.g.edge(code_of_parent, i[6])
+            if i.find(code_of_son + ' --') > -1 and i.find('invis') == -1:    # нашли дочерние узлы у удаляемого
+                code_of_new_son = i[6]
                 self.g.body.remove(i)
-                self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')
+
+        for i in enumerate(self.g.body):
+            if i[1] == '\t' + code_of_parent + ' -- ' + code_of_son:
+                self.g.body[i[0]] = '\t' + code_of_parent + ' -- ' + code_of_new_son
 
         for i in self.g.body:
             if i.find('\t' + code_of_son + ' --') > -1:
@@ -222,8 +225,9 @@ if __name__ == '__main__':
     b.insert_node('7')
     b.insert_node('5')
     b.insert_node('1')
+    b.insert_node('1')
     print(b.pre_order([]))
     b.remove_node('-1', None)
     print(b.pre_order([]))
-
+    # b.remove_node('1', None)
     b.g.print_graph()
