@@ -1,171 +1,18 @@
-import threading
-
 from kivy.config import Config
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.treeview import TreeView, TreeViewLabel
-
-Config.set('graphics', 'height', 640)
-
-from kivy.app import App
-from kivy.uix.gridlayout import GridLayout  # табличное размещение
 from kivy.uix.button import Button  # кнопка
 from kivy.uix.textinput import TextInput  # поле для ввода
-import time
-
 from kivy.uix.widget import Widget
-
-from graphviz import Graph
-import os
-
-os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'  # для грапхвиза, его надо скачать
-
-result = ''  # нода родитель
-marks = False
-
-class BinaryTree:
-    def __init__(self, value):  # конструктор
-        self.value = value  # основное значение
-        self.left_child = None  # левый сосу... сынок
-        self.right_child = None  # правый сынок
-
-    def insert_node(self, value):  # добавление в дерево
-        global result  # стучимся к глоабльному результату
-        result = str(self.value)  # если нашли куда вставить, берем родительсую ноду
-        if value <= self.value and self.left_child:
-            self.left_child.insert_node(value)
-        elif value <= self.value:
-            self.left_child = BinaryTree(value)
-            # print(self.value, 'min')
-        elif value > self.value and self.right_child:
-            self.right_child.insert_node(value)
-        else:
-            self.right_child = BinaryTree(value)
-            # print(self.value, 'max')
-            result = str(self.value)
-
-    def pre_order(self, ls):  # Предварительный обход (сверху вниз)
-        # print(self.value)     # вывод всего дерева, не нужно для фраемворка
-        ls.append(self.value)
-
-        if self.left_child:
-            self.left_child.pre_order(ls)
-
-        if self.right_child:
-            self.right_child.pre_order(ls)
-
-        return ls
-
-    def in_order(self, ls):  # симметричный обход (снизу вверх)
-        if self.left_child:
-            self.left_child.in_order(ls)
-
-        ls.append(self.value)
-        # print(self.value)
-
-        if self.right_child:
-            self.right_child.in_order(ls)
-
-        return ls
-
-    def post_order(self, ls):  # обход в обратном порядке (с низу вверх по рядам)
-        if self.left_child:
-            self.left_child.post_order(ls)
-
-        if self.right_child:
-            self.right_child.post_order(ls)
-
-        ls.append(self.value)
-        # print(self.value)
-        return ls
-
-    def remove_node(self, value, parent):  # удаление узла, с присвоение к его перенту его чайлдов
-        global mark
-        if value < self.value and self.left_child:
-            return self.left_child.remove_node(value, self)
-        elif value < self.value:
-            return False
-        elif value > self.value and self.right_child:
-            return self.right_child.remove_node(value, self)
-        elif value > self.value:
-            return False
-        else:
-            try:
-                global marks
-                if self.left_child is None and self.right_child is None and self == parent.left_child:
-                    return False
-                    # parent.left_child = None
-                    # self.clear_node()
-                elif self.left_child is None and self.right_child is None and self == parent.right_child:
-                    return False
-                    # parent.right_child = None
-                    # self.clear_node()
-                elif self.left_child and self.right_child is None and self == parent.left_child:
-                    parent.left_child = self.left_child
-
-                    marks = True
-                    self.clear_node()
-                elif self.left_child and self.right_child is None and self == parent.right_child:
-                    parent.right_child = self.left_child
-
-                    self.clear_node()
-                elif self.right_child and self.left_child is None and self == parent.left_child:
-                    parent.left_child = self.right_child
-
-                    marks = True
-                    self.clear_node()
-                elif self.right_child and self.left_child is None and self == parent.right_child:
-                    parent.right_child = self.right_child
-                    self.clear_node()
-                else:
-                    return False
-                    # self.value = self.right_child.find_minimum_value()
-                    # self.right_child.remove_node(self.value, self)
-            except AttributeError:  # если пытается удалить корень
-                return False
-            else:
-                return True
-
-    def find_minimum_value(self):  # нужно для поиска минимального значения при коннекте к перенту после удаления
-        if self.left_child:
-            return self.left_child.find_minimum_value()
-        else:
-            return self.value
-
-    def clear_node(self):  # удаляем саму ноду + сыновей
-        self.value = None
-        self.left_child = None
-        self.right_child = None
-
-    def find_node(self, value):  # поиск по дереву, для того чтоб не вставлять одинаковые значения
-        if value < self.value and self.left_child:
-            return self.left_child.find_node(value)
-        if value > self.value and self.right_child:
-            return self.right_child.find_node(value)
-
-        return value == self.value
-
-
-def reformat(counter):  # подбираем букву по коуyтеру
-    return chr(ord('A') + counter)
+from test import BinaryTree
+Config.set('graphics', 'height', 640)
+from kivy.app import App
 
 
 class MyApp(App):
-    root_of_tree = BinaryTree(0)  # само дерево(бинарное)
-    dot = Graph(format='png')  # сам граф(рисунок)
-    counter = 0  # генерация кода для нод, для рисовалки графа
-    dict_of_nodes = {}  # запись узлов в словарь для рисования
-    temp_var1 = 0  # переменные для рисования)
-    temp_var2 = 0
-    temp_var3 = '0'
-    temp_var4 = '0'
-    vihod = False
-
-    def sorts2(self, x):  # сортировка по ключу, а именно для обновления графа
-        return x.find('label')
+    root_of_tree = None  # само дерево(бинарное)
 
     img = Image(
         source='C:\\PyProj\\ASD\\test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
@@ -193,82 +40,17 @@ class MyApp(App):
             ti.hint_text_color = [1, 0, 1, 1]
             ti.hint_text = 'Число принято,\nвведите новое:'
 
-            if self.root_of_tree.value == 0:  # если корня нет
+            if self.root_of_tree is None:  # если корня нет
                 self.root_of_tree = BinaryTree(value)
+                self.root_of_tree.g.add_node(str(value), None)
                 return
             else:
                 self.root_of_tree.insert_node(value)  # вставляем в дерево новый узел
 
-                if result not in self.dict_of_nodes.values():  # в словарь добавляем значение ноды (value), и её клуч (counter)
-                    self.counter += 1   # ключ генерируется для рисовалки, каждый новый узел + 1
-                    code = reformat(self.counter)   # мы получаем ключ буквенный, чтоб было легче
-                    self.dict_of_nodes.update({code: str(result)})  # добавляем ключ + значеение в словарь
-                    self.temp_var1 = code  # вводим в временную переменную ключ, для вывода графа
-                else:
-                    for i, j in self.dict_of_nodes.items():  # если же всё таки родитель есть, что скорее всего, просто находим его и берем его клуч
-                        if result == j:
-                            self.temp_var1 = i
-                            break
-
-                self.dot.node(self.temp_var1,
-                              str(result))  # добавляем ноду родителя в граф, или же если она была просто конектим её
-
-                if ti.text not in self.dict_of_nodes.values():  # если нет дочернего в словаре, добавляем его, по аналогии с перентом
-                    self.counter += 1
-                    code = reformat(self.counter)
-                    self.dict_of_nodes.update({code: str(value)})
-                    self.temp_var2 = code
-                else:
-                    for i, j in self.dict_of_nodes.items():
-                        if result == j:
-                            self.temp_var2 = i
-
-                self.dot.node(self.temp_var2, str(value))
-
-                rebro = self.temp_var1 + self.temp_var2  # код ребра, обычно просто 2 символа - 12 - первый узел со вторым, это же и ребро
-                self.dot.edges([rebro])  # рисуем ребра
-
-                for i in self.dot.body:     # делаем чтоб было как бинарное!!!!
-                    if i.find(self.temp_var1 + ' -- ') > -1 and i.find('[style=invis]') == -1:
-                        # мы находим узел который уже прицеплен к ноде, допустим перент 1 дочь 2, мы нашли 2
-                        for j in enumerate(self.dot.body):
-                            # но, так как всё в кодах, мы через код (букву узла) ищем значение этого узла,
-                            # то есть 1 - A 2 - B, мы знаем B и ищем значение, то есть 2
-                            if j[1].find(i[6:7]) > -1 and j[1].find(' -- ') == -1 and float(j[1][j[1].find('=') + 1:j[1].find(']')]) > value:  # сравниваем его с добавляемым
-                                # если тот что блы дочерний, больше, то просто свапаем их в списке узлов (graphviz), далее, до break тупо свап
-                                self.dot.body[len(self.dot.body) - 1] = '\t' + self.temp_var1 + ' -- ' + j[1][1:2]
-                                for k in enumerate(self.dot.body):
-                                    if k[1].find(self.temp_var1 + ' -- ' + j[1][1:2]) > -1:
-                                        self.dot.body[k[0]] = '\t' + self.temp_var1 + ' -- ' + self.temp_var2
-                                        break
-                                break
-                        break
-
-                self.dot.body = sorted(self.dot.body, key=self.sorts2)   # обновляем граф
-
-                if self.temp_var3 != rebro[:1]:  # для того чтоб нормально рисовалось (как дерево)
-                    # если узел который мы добавляем - новый, то бахаем к вместе с ним к перенту невидимый узел,
-                    # чтоб он смещал его туда, куда надо
-                    self.temp_var3 = rebro[:1]
-                    self.dot.node(str(self.counter), "", style='invis')
-                    self.dot.edge(rebro[:1], str(self.counter), style='invis')
-                else:
-                    # если же, уже есть 1 доч. узел у перента, то удаляем инвизный узел и суем обычный,
-                    # тем самым дерево остается таким каким было
-                    for i in enumerate(self.dot.body):
-                        if i[1].find(' -- ' + self.temp_var3) > -1 and i[1].find('[style=invis]') > -1:
-                            self.dot.body.pop(i[0])
-
             bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
-
-            self.dot.render(
-                'test-output/round-table.gv')  # выводим граф в файл, расширение - выше, путь - папка test-output
 
             self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
             bl_for_tree.add_widget(self.img)
-
-        def sorts(x):  # сортировка кода графа  по ребрам
-            return x.find('--')
 
         # =============================================================================
 
@@ -293,51 +75,6 @@ class MyApp(App):
                 return
 
             bl_for_tree.clear_widgets()  # чистим вывод для дерева
-            self.dot.body = sorted(self.dot.body, key=sorts)
-
-            code_of_remove_node = '0'
-            temp1 = '0'
-            temp2 = '0'
-
-            i = 0  # бегунок по списку рисовалки графа
-            n = len(self.dot.body) - 1
-
-            while i < n:
-                if self.dot.body[i].find('label=' + value) > -1:
-                    if code_of_remove_node == '0':
-                        code_of_remove_node = self.dot.body[i][1]
-                    if code_of_remove_node != '0' and code_of_remove_node == self.dot.body[i][1]:
-                        print('Удалил', self.dot.body[i])
-                        self.dot.body.pop(i)
-                        i = 0
-                        n -= 1
-                i += 1
-
-            i = 0
-
-            while i < n:
-                if self.dot.body[i].find('-- ' + code_of_remove_node) > -1:
-                    if temp1 == '0':
-                        temp1 = self.dot.body[i][1]
-                    if temp1 == self.dot.body[i][1] and temp1 != '0':
-                        self.dot.body.pop(i)
-
-                if self.dot.body[i].find(code_of_remove_node + ' --') > -1:
-                    if temp1 != '0':
-                        self.dot.body[i] = self.dot.body[i][:1] + temp1 + ' ' + self.dot.body[i][3:]
-                        # print(self.dot.body[i])
-                        # print(self.dot.body)
-                i += 1
-
-            print(self.dot.body)
-            # global marks
-            # if marks is True:
-            #     marks = False
-            #     self.dot.body = list(reversed(self.dot.body))
-
-
-
-            self.dot.render('test-output/round-table.gv')
 
             self.img.reload()
             bl_for_tree.add_widget(self.img)
@@ -397,4 +134,5 @@ class MyApp(App):
         return bl
 
 
-MyApp().run()
+if __name__ == '__main__':
+    MyApp().run()

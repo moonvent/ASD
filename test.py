@@ -52,8 +52,9 @@ class Graph:
                 self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
                 self.g.edge(code_of_parent, code_of_node)
 
+        self.g.render('test-output/round-table.gv')
+
     def print_graph(self):
-        print(self.g.body)
         self.g.render('test-output/round-table.gv', view=True)
 
     def task(self, value, parent):
@@ -82,9 +83,7 @@ class Graph:
             if i.find('\t' + code_of_son + ' --') > -1:
                 self.g.body.remove(i)
 
-
-        # self.g.body = sorted(self.g.body, key=self.sorts)
-        # self.g.body = reversed(self.g.body)
+        self.g.render('test-output/round-table.gv')
 
 
 class BinaryTree:
@@ -100,12 +99,12 @@ class BinaryTree:
             self.left_child.insert_node(value)
         elif value <= self.value:
             self.left_child = BinaryTree(value)
-            self.g.add_node(value, str(self.value))
+            self.g.add_node(str(value), str(self.value))
         elif value > self.value and self.right_child:
             self.right_child.insert_node(value)
         else:
             self.right_child = BinaryTree(value)
-            self.g.add_node(value, str(self.value))
+            self.g.add_node(str(value), str(self.value))
 
     def pre_order(self, ls):  # Предварительный обход (сверху вниз)
         # print(self.value)     # вывод всего дерева, не нужно для фраемворка
@@ -181,8 +180,7 @@ class BinaryTree:
             except AttributeError:  # если пытается удалить корень
                 return False
             else:
-                print(value, parent.value)
-                self.g.task(value, parent.value)
+                self.g.task(str(value), str(parent.value))    # передаем в задачу родителя и сына,
                 return True
 
     def find_minimum_value(self):  # нужно для поиска минимального значения при коннекте к перенту после удаления
@@ -206,28 +204,34 @@ class BinaryTree:
 
 
 if __name__ == '__main__':
-    b = BinaryTree('0')
-    b.g.add_node("0", None)
+    pass
+    # b = BinaryTree(1)
+    # b.g.add_node("1", None)
     # for i in range(10):
     #     b.insert_node(str(i))
-    b.insert_node('3')
-    b.insert_node('-1')
-    b.insert_node('2')
-    b.insert_node('4')
-    b.insert_node('3')
-    b.insert_node('6')
-    b.insert_node("2.5")
-    b.insert_node('3')
-    b.insert_node('4')
-    b.insert_node('4')
-    b.insert_node('3')
-    b.insert_node('-2')
-    b.insert_node('7')
-    b.insert_node('5')
-    b.insert_node('1')
-    b.insert_node('1')
-    print(b.pre_order([]))
-    b.remove_node('-1', None)
-    print(b.pre_order([]))
+    # b.insert_node('3')
+    # b.insert_node('-1')
+    # b.insert_node('2')
+    # b.insert_node('4')
+    # b.insert_node('3')
+    # b.insert_node('6')
+    # b.insert_node("2.5")
+    # b.insert_node('3')
+    # b.insert_node('4')
+    # b.insert_node('4')
+    # b.insert_node('3')
+    # b.insert_node('-2')
+    # b.insert_node('7')
+    # b.insert_node('5')
+    # b.insert_node('1')
+    # b.insert_node('1')
+    # print(b.pre_order([]))
+    # b.remove_node('-1', None)
+    # print(b.pre_order([]))
     # b.remove_node('1', None)
-    b.g.print_graph()
+    # b.insert_node(float("2"))
+    # b.insert_node(float("-1"))
+    # b.insert_node(float("0.5"))
+    # b.insert_node(float("-2"))
+    # # print(b.pre_order([]))
+    # b.g.print_graph()
