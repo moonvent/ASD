@@ -28,9 +28,16 @@ class MyApp(App):
         def add(instance):  # функция на добавление элемента в дерево, рисунок
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
                 float(ti.text)  # работаем с инт , если что менять тут и в TextInput
+                if ti.text.find('-0') > -1:
+                    raise Exception('Ноль')
             except ValueError:
                 ti.text = ''
                 ti.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
+                ti.hint_text_color = [1, 0, 0, 1]
+                return
+            except Exception:
+                ti.text = ''
+                ti.hint_text = 'ПРИКОЛЬНЫЙ ПРИКОЛ)))'
                 ti.hint_text_color = [1, 0, 0, 1]
                 return
 

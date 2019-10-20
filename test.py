@@ -1,3 +1,4 @@
+import chardet
 import graphviz
 import os
 
@@ -60,9 +61,9 @@ class Graph:
     def task(self, value, parent):
         code_of_parent, code_of_son = '0', '0'
         for i in self.dict_of_nodes.items():
-            if i[1] == parent and code_of_parent == '0':
+            if i[1] == parent:   # вот тут and code_of_parent == '0'
                 code_of_parent = i[0]
-            if i[1] == value and code_of_son == '0':
+            if i[1] == value:   # вот тут and code_of_son == '0'
                 code_of_son = i[0]
             if code_of_parent != '0' and code_of_son != '0':
                 break
