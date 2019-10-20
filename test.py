@@ -22,6 +22,8 @@ class Graph:
 
     def add_node(self, value, parent):
         code_of_node = self.reformat()
+        if parent is not None and float(value) > float(parent):
+            self.g.node(self.reformat_for_invis(), '', style='invis')
         self.g.node(code_of_node, value)
         self.dict_of_nodes.update({code_of_node: value})
         code_of_parent = '0'    # код перента
@@ -39,6 +41,7 @@ class Graph:
             if parent is None:
                 return
             if float(value) <= float(parent):
+                print(str(value) + '<' + str(parent))
                 for i in enumerate(self.g.body):
                     if i[1].find(code_of_parent + ' -- ') > -1 and i[1].find('invis') > -1:
                         self.g.body[i[0]] = '\t' + code_of_parent + ' -- ' + code_of_node
@@ -49,7 +52,8 @@ class Graph:
                     self.g.node(self.reformat_for_invis(), '', style='invis')
                     self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
             else:
-                self.g.node(self.reformat_for_invis(), '', style='invis')
+                print(str(value) + '>' + str(parent))
+                # self.g.node(self.reformat_for_invis(), '', style='invis')
                 self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
                 self.g.edge(code_of_parent, code_of_node)
 
