@@ -21,7 +21,6 @@ class Graph:
         return x.find('label')
 
     def add_node(self, value, parent):
-
         code_of_node = self.reformat()
         if parent is not None and float(value) >= float(parent):
             self.g.node(self.reformat_for_invis(), '', style='invis')
@@ -58,6 +57,7 @@ class Graph:
                 self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
                 self.g.edge(code_of_parent, code_of_node)
 
+        self.clear_graph()
         self.g.render('test-output/round-table.gv')     # переписываем граф
 
     def print_graph(self):
@@ -83,6 +83,7 @@ class Graph:
             if code_of_parent != '0' and code_of_son != '0':
                 break
 
+        self.dict_of_nodes.pop(code_of_son)     # удаление из словаря лишнего узла
         self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')  # удаляем узел удаляемого
 
         for i in self.g.body:   # удаление ребра
@@ -103,6 +104,7 @@ class Graph:
             if code_of_parent != '0' and code_of_son != '0':
                 break
 
+        self.dict_of_nodes.pop(code_of_son)  # удаления узла из словаря с узлами
         self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')   # удаляем узел удаляемого
 
         code_of_new_son = '0'
