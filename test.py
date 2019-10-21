@@ -21,6 +21,7 @@ class Graph:
         return x.find('label')
 
     def add_node(self, value, parent):
+
         code_of_node = self.reformat()
         if parent is not None and float(value) >= float(parent):
             self.g.node(self.reformat_for_invis(), '', style='invis')
@@ -57,12 +58,42 @@ class Graph:
                 self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
                 self.g.edge(code_of_parent, code_of_node)
 
-        self.g.render('test-output/round-table.gv')
+        self.g.render('test-output/round-table.gv')     # переписываем граф
 
     def print_graph(self):
         self.g.render('test-output/round-table.gv', view=True)
 
-    def task(self, value, parent):
+    def clear_graph(self):
+        for i in self.g.body:
+            if i.find(' [label="" style=invis]') > -1:  # нашли инвизный узел
+                for j in self.g.body:
+                    if j.find(' -- ' + i[1] + ' [style=invis weight=10]') > -1:  # ищем ребро к инвизному узлу
+                        break
+                else:   # если не нашли ребро, то удаляем узел
+                    self.g.body.remove(i)
+
+    def for_leaf(self, value, parent):
+        self.clear_graph()
+        code_of_parent, code_of_son = '0', '0'
+        for i in self.dict_of_nodes.items():
+            if i[1] == parent:  # вот тут and code_of_parent == '0'
+                code_of_parent = i[0]
+            if i[1] == value:  # вот тут and code_of_son == '0'
+                code_of_son = i[0]
+            if code_of_parent != '0' and code_of_son != '0':
+                break
+
+        self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')  # удаляем узел удаляемого
+
+        for i in self.g.body:   # удаление ребра
+            if i.find(code_of_son) > -1:
+                self.g.body.remove(i)
+                break
+
+        self.g.render('test-output/round-table.gv')     # переписываем граф
+
+    def for_one_son(self, value, parent):
+        self.clear_graph()
         code_of_parent, code_of_son = '0', '0'
         for i in self.dict_of_nodes.items():
             if i[1] == parent:   # вот тут and code_of_parent == '0'
@@ -88,7 +119,7 @@ class Graph:
             if i.find('\t' + code_of_son + ' --') > -1:
                 self.g.body.remove(i)
 
-        self.g.render('test-output/round-table.gv')
+        self.g.render('test-output/round-table.gv')     # переписываем граф
 
 
 class BinaryTree:
@@ -158,26 +189,30 @@ class BinaryTree:
         else:
             try:
                 # global marks
-                if self.left_child is None and self.right_child is None and self == parent.left_child:
-                    return False
-                    # parent.left_child = None
-                    # self.clear_node()
+                if self.left_child is None and self.right_child is None and self == parent.left_child:  # удаление листа
+                    parent.left_child = None
+                    self.clear_node()
+                    self.g.for_leaf(str(value), str(parent.value))  # передаем в задачу родителя и сына,
                 elif self.left_child is None and self.right_child is None and self == parent.right_child:
-                    return False
-                    # parent.right_child = None
-                    # self.clear_node()
-                elif self.left_child and self.right_child is None and self == parent.left_child:
+                    parent.right_child = None
+                    self.clear_node()
+                    self.g.for_leaf(str(value), str(parent.value))  # передаем в задачу родителя и сына,
+                elif self.left_child and self.right_child is None and self == parent.left_child:    # удаление если есть один сын
                     parent.left_child = self.left_child
                     self.clear_node()
+                    self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
                 elif self.left_child and self.right_child is None and self == parent.right_child:
                     parent.right_child = self.left_child
                     self.clear_node()
+                    self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
                 elif self.right_child and self.left_child is None and self == parent.left_child:
                     parent.left_child = self.right_child
                     self.clear_node()
+                    self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
                 elif self.right_child and self.left_child is None and self == parent.right_child:
                     parent.right_child = self.right_child
                     self.clear_node()
+                    self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
                 else:
                     return False
                     # self.value = self.right_child.find_minimum_value()
@@ -185,7 +220,6 @@ class BinaryTree:
             except AttributeError:  # если пытается удалить корень
                 return False
             else:
-                self.g.task(str(value), str(parent.value))    # передаем в задачу родителя и сына,
                 return True
 
     def find_minimum_value(self):  # нужно для поиска минимального значения при коннекте к перенту после удаления
