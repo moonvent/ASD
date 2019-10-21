@@ -22,7 +22,7 @@ class Graph:
 
     def add_node(self, value, parent):
         code_of_node = self.reformat()
-        if parent is not None and float(value) > float(parent):
+        if parent is not None and float(value) >= float(parent):
             self.g.node(self.reformat_for_invis(), '', style='invis')
         self.g.node(code_of_node, value)
         self.dict_of_nodes.update({code_of_node: value})
