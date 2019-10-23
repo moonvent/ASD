@@ -147,8 +147,8 @@ class Graph:
 
         self.g.render('test-output/round-table.gv')  # переписываем граф
 
-    def for_two_son_and_one_root(self, value, parent, new_value):
-        print(value, parent, new_value)
+    def for_two_son_and_one_root(self, value, parent):
+        print(value, parent)
         self.clear_graph()
         code_of_parent, code_of_son = '0', '0'
         for i in self.dict_of_nodes.items():
@@ -159,23 +159,33 @@ class Graph:
             if code_of_parent != '0' and code_of_son != '0':
                 break
 
-        # print('Сын', value, code_of_son)
-        # print('Отец', parent, code_of_parent)
-        # print('Новое значение', new_value)
+        temp_node = str()
+        for i in self.g.body:   # находим узлы дочерние от дочернего, чтоб перепривязать к отцу
+            if i.find(code_of_son + ' -- ') > -1:
+                if i.find('invis') == -1:   # записываем дочерние которые не инвиз
+                    temp_node = i[6]  # код узла дочернего от дочерненго перента
+                    print(temp_node)
+                    self.g.body.remove(i)   # удаляем все узлы у него, и дочерние тоже, если не будет работать убрать условие и поставить брейк
 
-        print(new_value, value)
-        self.for_one_son(new_value, value)
+        for i in self.g.body:   # чистка дочернего узла, от инвизных
+            if i.find(code_of_son + ' -- ') > -1 and i.find('invis') > -1:
+                self.g.body.remove(i)
+                break
 
-        print(self.g.body)
-        # for i in enumerate(self.g.body):    # меняем значение узла
-        #     if i[1] == '\t' + code_of_son + ' [label=' + value + ']':
-        #         self.g.body[i[0]] = '\t' + code_of_son + ' [label=' + new_value + ']'
-        #         self.dict_of_nodes[code_of_son] = new_value
-        #         break
+        self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')   # удалил нужный узел
+        self.dict_of_nodes.pop(code_of_son)
+        self.dict_of_nodes[code_of_parent] = value
 
-        # print('keks')
-        # print(self.g.body)
-        # print(self.dict_of_nodes)
+        for i in enumerate(self.g.body):    # переписываем перента на сына, меняем значение сына на отца то есть
+            if i[1].find('\t' + code_of_parent + ' [label=' + parent + ']') > -1:
+                self.g.body[i[0]] = '\t' + code_of_parent + ' [label=' + value + ']'
+                break
+
+        for i in enumerate(self.g.body):    # привязываем дочерний узел у дочернего к перенту, перенту
+            if i[1].find(code_of_parent + ' -- ' + code_of_son) > -1:
+                self.g.body[i[0]] = '\t' + code_of_parent + ' -- ' + temp_node
+                break
+
         self.g.render('test-output/round-table.gv')  # переписываем граф
 
 
@@ -294,10 +304,11 @@ class BinaryTree:
             except AttributeError:  # если пытается удалить корень
                 return False
             else:
+                # print(pre_minimum, parent.value, minimun, 'keks', self.value, value)
                 if counter == 1:    # если у узла с двумя удаляемыми есть меньший элемент в правой левой ветке
                     self.g.for_two_son(str(pre_minimum), str(parent.value), str(minimun))
                 elif counter == 2:  # если его нет
-                    self.g.for_two_son_and_one_root(str(self.value), str(parent.value), str(self.right_child.find_minimum_value()))
+                    self.g.for_two_son_and_one_root(str(self.value), str(value))
                 counter = 0
                 return True
 
