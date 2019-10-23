@@ -4,6 +4,8 @@ import os
 
 os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'  # для грапхвиза, его надо скачать
 
+counter, pre_minimum, minimun = 0, 0, 0
+
 
 class Graph:
     g = graphviz.Graph(format='png')
@@ -41,7 +43,6 @@ class Graph:
             if parent is None:
                 return
             if float(value) <= float(parent):
-                print(str(value) + '<' + str(parent))
                 for i in enumerate(self.g.body):
                     if i[1].find(code_of_parent + ' -- ') > -1 and i[1].find('invis') > -1:
                         self.g.body[i[0]] = '\t' + code_of_parent + ' -- ' + code_of_node
@@ -52,7 +53,6 @@ class Graph:
                     self.g.node(self.reformat_for_invis(), '', style='invis')
                     self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
             else:
-                print(str(value) + '>' + str(parent))
                 # self.g.node(self.reformat_for_invis(), '', style='invis')
                 self.g.edge(code_of_parent, self.reformat_for_invis(), style='invis', weight='10')
                 self.g.edge(code_of_parent, code_of_node)
@@ -89,7 +89,7 @@ class Graph:
         for i in self.g.body:   # удаление ребра
             if i.find(code_of_son) > -1:
                 self.g.body.remove(i)
-                break
+                # break     # баг, если 1 2 3 удалить 3 2
 
         self.g.render('test-output/round-table.gv')     # переписываем граф
 
@@ -108,20 +108,75 @@ class Graph:
         self.g.body.remove('\t' + code_of_son + ' [label=' + value + ']')   # удаляем узел удаляемого
 
         code_of_new_son = '0'
-        for i in self.g.body:
+        for i in self.g.body:   # ведем поиск привязанных узлов к удаляемому (удаляемый -- нужный для сейва)
             if i.find(code_of_son + ' --') > -1 and i.find('invis') == -1:    # нашли дочерние узлы у удаляемого
-                code_of_new_son = i[6]
+                code_of_new_son = i[6]  # сохраняем код дочернего узла
                 self.g.body.remove(i)
 
-        for i in enumerate(self.g.body):
+        for i in enumerate(self.g.body):    # добавляем к перенту удаляемого узла дочерний зузел удаляемого узла
             if i[1] == '\t' + code_of_parent + ' -- ' + code_of_son:
                 self.g.body[i[0]] = '\t' + code_of_parent + ' -- ' + code_of_new_son
 
-        for i in self.g.body:
+        for i in self.g.body:   # удаляем все инвизные узлы у узла который мы удалили
             if i.find('\t' + code_of_son + ' --') > -1:
+                if i.find('invis') > -1:    # удаление ещё и узлов инвизных, если будет карать , коментнуть
+                    self.g.body.remove('\t' + i[6] + ' [label="" style=invis]')
                 self.g.body.remove(i)
 
         self.g.render('test-output/round-table.gv')     # переписываем граф
+
+    def for_two_son(self, value, parent, new_value):
+        print(value, parent, new_value)
+        self.clear_graph()
+        code_of_parent, code_of_son = '0', '0'
+        for i in self.dict_of_nodes.items():
+            if i[1] == parent:  # вот тут and code_of_parent == '0'
+                code_of_parent = i[0]
+            if i[1] == value:  # вот тут and code_of_son == '0'
+                code_of_son = i[0]
+            if code_of_parent != '0' and code_of_son != '0':
+                break
+
+        self.for_leaf(new_value, value)
+
+        for i in enumerate(self.g.body):    # меняем значение узла
+            if i[1] == '\t' + code_of_son + ' [label=' + value + ']':
+                self.g.body[i[0]] = '\t' + code_of_son + ' [label=' + new_value + ']'
+                self.dict_of_nodes[code_of_son] = new_value
+                break
+
+        self.g.render('test-output/round-table.gv')  # переписываем граф
+
+    def for_two_son_and_one_root(self, value, parent, new_value):
+        print(value, parent, new_value)
+        self.clear_graph()
+        code_of_parent, code_of_son = '0', '0'
+        for i in self.dict_of_nodes.items():
+            if i[1] == parent:  # вот тут and code_of_parent == '0'
+                code_of_parent = i[0]
+            if i[1] == value:  # вот тут and code_of_son == '0'
+                code_of_son = i[0]
+            if code_of_parent != '0' and code_of_son != '0':
+                break
+
+        # print('Сын', value, code_of_son)
+        # print('Отец', parent, code_of_parent)
+        # print('Новое значение', new_value)
+
+        print(new_value, value)
+        self.for_one_son(new_value, value)
+
+        print(self.g.body)
+        # for i in enumerate(self.g.body):    # меняем значение узла
+        #     if i[1] == '\t' + code_of_son + ' [label=' + value + ']':
+        #         self.g.body[i[0]] = '\t' + code_of_son + ' [label=' + new_value + ']'
+        #         self.dict_of_nodes[code_of_son] = new_value
+        #         break
+
+        # print('keks')
+        # print(self.g.body)
+        # print(self.dict_of_nodes)
+        self.g.render('test-output/round-table.gv')  # переписываем граф
 
 
 class BinaryTree:
@@ -189,39 +244,61 @@ class BinaryTree:
         elif value > self.value:
             return False
         else:
+            global counter, pre_minimum, minimun
             try:
-                # global marks
                 if self.left_child is None and self.right_child is None and self == parent.left_child:  # удаление листа
                     parent.left_child = None
                     self.clear_node()
-                    self.g.for_leaf(str(value), str(parent.value))  # передаем в задачу родителя и сына,
-                elif self.left_child is None and self.right_child is None and self == parent.right_child:
+                    if counter > 0:  # если удаляем элемент с двумя сыновьями
+                        return
+                    else:
+                        self.g.for_leaf(str(value), str(parent.value))  # передаем в задачу родителя и сына,
+                elif self.left_child is None and self.right_child is None and self == parent.right_child:  # удаление листа
                     parent.right_child = None
                     self.clear_node()
-                    self.g.for_leaf(str(value), str(parent.value))  # передаем в задачу родителя и сына,
+                    if counter > 0:  # если удаляем элемент с двумя сыновьями
+                        return
+                    else:
+                        self.g.for_leaf(str(value), str(parent.value))  # передаем в задачу родителя и сына,
                 elif self.left_child and self.right_child is None and self == parent.left_child:    # удаление если есть один сын
+                    print('sex3')
                     parent.left_child = self.left_child
                     self.clear_node()
                     self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
-                elif self.left_child and self.right_child is None and self == parent.right_child:
+                elif self.left_child and self.right_child is None and self == parent.right_child:   # один сын
+                    print('sex2')
                     parent.right_child = self.left_child
                     self.clear_node()
                     self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
-                elif self.right_child and self.left_child is None and self == parent.left_child:
+                elif self.right_child and self.left_child is None and self == parent.left_child:   # один сын
+                    print('sex1')
                     parent.left_child = self.right_child
                     self.clear_node()
                     self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
-                elif self.right_child and self.left_child is None and self == parent.right_child:
+                elif self.right_child and self.left_child is None and self == parent.right_child:   # один сын
+                    print('sex')
+                    if counter == 1:    # флаг, если удаляем узел с двумя
+                        counter += 1
                     parent.right_child = self.right_child
                     self.clear_node()
-                    self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
-                else:
-                    return False
-                    # self.value = self.right_child.find_minimum_value()
-                    # self.right_child.remove_node(self.value, self)
+                    if counter == 2:    # выходим из функции если с двумя, так как для этого другая удалялка
+                        return
+                    else:
+                        self.g.for_one_son(str(value), str(parent.value))  # передаем в задачу родителя и сына,
+                else:   # если два сына
+                    counter += 1    # ставим метку что удаляем узел с 2
+                    pre_minimum = self.value
+                    minimun = self.right_child.find_minimum_value()
+                    self.value = self.right_child.find_minimum_value()
+                    self.right_child.remove_node(self.value, self)
             except AttributeError:  # если пытается удалить корень
                 return False
             else:
+                if counter == 1:    # если у узла с двумя удаляемыми есть меньший элемент в правой левой ветке
+                    self.g.for_two_son(str(pre_minimum), str(parent.value), str(minimun))
+                elif counter == 2:  # если его нет
+                    self.g.for_two_son_and_one_root(str(self.value), str(parent.value), str(self.right_child.find_minimum_value()))
+                counter = 0
                 return True
 
     def find_minimum_value(self):  # нужно для поиска минимального значения при коннекте к перенту после удаления
@@ -246,33 +323,3 @@ class BinaryTree:
 
 if __name__ == '__main__':
     pass
-    # b = BinaryTree(1)
-    # b.g.add_node("1", None)
-    # for i in range(10):
-    #     b.insert_node(str(i))
-    # b.insert_node('3')
-    # b.insert_node('-1')
-    # b.insert_node('2')
-    # b.insert_node('4')
-    # b.insert_node('3')
-    # b.insert_node('6')
-    # b.insert_node("2.5")
-    # b.insert_node('3')
-    # b.insert_node('4')
-    # b.insert_node('4')
-    # b.insert_node('3')
-    # b.insert_node('-2')
-    # b.insert_node('7')
-    # b.insert_node('5')
-    # b.insert_node('1')
-    # b.insert_node('1')
-    # print(b.pre_order([]))
-    # b.remove_node('-1', None)
-    # print(b.pre_order([]))
-    # b.remove_node('1', None)
-    # b.insert_node(float("2"))
-    # b.insert_node(float("-1"))
-    # b.insert_node(float("0.5"))
-    # b.insert_node(float("-2"))
-    # # print(b.pre_order([]))
-    # b.g.print_graph()
