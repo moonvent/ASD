@@ -188,12 +188,12 @@ class BinaryTree:
         self.right_child = None  # правый сынок
 
     def insert_node(self, value):  # добавление в дерево
-        if value <= self.value and self.left_child:
+        if value < self.value and self.left_child:
             self.left_child.insert_node(value)
-        elif value <= self.value:
+        elif value < self.value:
             self.left_child = BinaryTree(value)
             self.g.add_node(str(value), str(self.value))
-        elif value > self.value and self.right_child:
+        elif value >= self.value and self.right_child:
             self.right_child.insert_node(value)
         else:
             self.right_child = BinaryTree(value)
