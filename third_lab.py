@@ -1,3 +1,4 @@
+from kivy.clock import Clock
 from kivy.config import Config
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
@@ -50,6 +51,11 @@ class MyApp(App):
             if self.root_of_tree is None:  # если корня нет
                 self.root_of_tree = BinaryTree(value)
                 self.root_of_tree.g.add_node(str(value), None)
+                self.root_of_tree.g.print_graph()
+                bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
+
+                self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
+                bl_for_tree.add_widget(self.img)
                 return
             else:
                 self.root_of_tree.insert_node(value)  # вставляем в дерево новый узел
@@ -124,6 +130,7 @@ class MyApp(App):
                        input_filter='float',  # автопроверка на инт))
                        on_text_validate=add,  # при нажатии на энтер элемент добавляется
                        )
+        ti.focus = True
 
         control_bl.add_widget(ti)
         control_bl.add_widget(Button(text='Добавить',

@@ -58,10 +58,14 @@ class Graph:
                 self.g.edge(code_of_parent, code_of_node)
 
         self.clear_graph()
+        print(self.dict_of_nodes)
+        print(code_of_parent, parent, 'Отец')
+        print(code_of_node, value, 'Сын')
+        print(self.g.body)
         self.g.render('test-output/round-table.gv')     # переписываем граф
 
     def print_graph(self):
-        self.g.render('test-output/round-table.gv', view=True)
+        self.g.render('test-output/round-table.gv')
 
     def clear_graph(self):
         for i in self.g.body:
@@ -117,16 +121,29 @@ class Graph:
             if i[1] == '\t' + code_of_parent + ' -- ' + code_of_son:
                 self.g.body[i[0]] = '\t' + code_of_parent + ' -- ' + code_of_new_son
 
-        for i in self.g.body:   # удаляем все инвизные узлы у узла который мы удалили
-            if i.find('\t' + code_of_son + ' --') > -1:
-                if i.find('invis') > -1:    # удаление ещё и узлов инвизных, если будет карать , коментнуть
-                    self.g.body.remove('\t' + i[6] + ' [label="" style=invis]')
-                self.g.body.remove(i)
+        i, n = 0, len(self.g.body)
+
+        # print(self.g.body)
+        while i < n:
+            if self.g.body[i].find('\t' + code_of_son + ' --') > -1:
+                self.g.body.pop(i)
+                i = 0
+                n -= 1
+            else:
+                i += 1
+
+        # print(self.g.body)
+
+        # for i in self.g.body:   # удаляем все инвизные узлы у узла который мы удалили
+        #     if i.find('\t' + code_of_son + ' --') > -1:
+        #         if i.find('invis') > -1:    # удаление ещё и узлов инвизных, если будет карать , коментнуть
+        #             self.g.body.remove('\t' + i[6] + ' [label="" style=invis]')
+        #         self.g.body.remove(i)
 
         self.g.render('test-output/round-table.gv')     # переписываем граф
 
     def for_two_son(self, value, parent, new_value):
-        print(value, parent, new_value)
+        # print(value, parent, new_value)
         self.clear_graph()
         code_of_parent, code_of_son = '0', '0'
         for i in self.dict_of_nodes.items():
@@ -148,7 +165,7 @@ class Graph:
         self.g.render('test-output/round-table.gv')  # переписываем граф
 
     def for_two_son_and_one_root(self, value, parent):
-        print(value, parent)
+        # print(value, parent)
         self.clear_graph()
         code_of_parent, code_of_son = '0', '0'
         for i in self.dict_of_nodes.items():
@@ -164,7 +181,7 @@ class Graph:
             if i.find(code_of_son + ' -- ') > -1:
                 if i.find('invis') == -1:   # записываем дочерние которые не инвиз
                     temp_node = i[6]  # код узла дочернего от дочерненго перента
-                    print(temp_node)
+                    # print(temp_node)
                     self.g.body.remove(i)   # удаляем все узлы у него, и дочерние тоже, если не будет работать убрать условие и поставить брейк
 
         for i in self.g.body:   # чистка дочернего узла, от инвизных
