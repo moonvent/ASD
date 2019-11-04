@@ -23,9 +23,11 @@ class MyApp(App):
                              size_hint=(1, .07),
                              )
         text_input_value = TextInput(hint_text='Введите сюда ключ:',
-                                     font_size=12)
+                                     font_size=12,
+                                     multiline=False)
         text_input_data = TextInput(hint_text='Введите сюда значение:',
-                                    font_size=12)
+                                    font_size=12,
+                                    multiline=False)
         table = GridLayout(cols=4,  # хеш - таблица
                            rows=6)
         for i in ['Ключ', 'Значение', 'Первичный ключ', 'Вторичный ключ']:
@@ -58,13 +60,24 @@ class MyApp(App):
                                on_press=add_in_table)
 
         def find_in_table(instance):
-            pass
+            if text_input_find.text == '':
+                self.clear_text_input(text_input_find)
+                return
+            result = hesh_lib.find_in_table(text_input_find.text)
+            if result == -1:
+                text_input_find.hint_text = 'Элемент не найден.'
+            else:
+                text_input_find.hint_text = 'Введите нужный ключ:'
+                label_of_log.text = ''
+                for i in result:
+                    label_of_log.text += i + ' '
 
         button_to_find = Button(text='Найти',
                                 font_size=15,
                                 on_press=find_in_table)
         text_input_find = TextInput(hint_text='Введите нужный ключ:',
-                                    font_size=12)
+                                    font_size=12,
+                                    multiline=False)
 
         toolbar.add_widget(text_input_value)
         toolbar.add_widget(text_input_data)

@@ -16,13 +16,13 @@ def add_in_table(value, data):
     key = hesh_func(value)
     if hesh_table[key] == '--':
         hesh_table[key] = (value, data)
-        print('Исходные данные - ', value, ';\nИндекс - ', key, ';\nДанные по этому ключу - ', data, '\n====================')
+        # print('Исходные данные - ', value, ';\nИндекс - ', key, ';\nДанные по этому ключу - ', data, '\n====================')
         return value, data, key, key, True
     else:   # если случилась коллизия, генерируем новый индекс для вставки в массив
         j = 1
         while True:
             if hesh_table[(key + pow(j, 2)) % len(hesh_table)] == '--':
-                print('Исходные данные - ',  value, ';\nИндекс - ', (key + pow(j, 2)) % len(hesh_table), ';\nДанные по этому ключу - ', data, '\n====================')
+                # print('Исходные данные - ',  value, ';\nИндекс - ', (key + pow(j, 2)) % len(hesh_table), ';\nДанные по этому ключу - ', data, '\n====================')
                 hesh_table[(key + pow(j, 2)) % len(hesh_table)] = (value, data)
                 return value, data, key, (key + pow(j, 2)) % len(hesh_table), True
             else:
@@ -34,14 +34,17 @@ def add_in_table(value, data):
 
 def find_in_table(value):
     index = hesh_func(value)
-    if hesh_table[index] == value:  # если ключ равен индексу
-        return index
+    if hesh_table[index][0] == value:  # если ключ равен индексу
+        return 'Ключ - ' + str(value), 'Значение - ' + str(hesh_table[index][1]), 'Первичный ключ - ' + str(index), 'Вторичный ключ - ' + str(index)
     j = 1
     while True:
-        if hesh_table[(index + pow(j, 2)) % len(hesh_table)] == value:
-            return index + pow(j, 2) % len(hesh_table)
+        if hesh_table[(index + pow(j, 2)) % len(hesh_table)][0] == value:
+            return 'Ключ - ' + str(value), 'Значение - ' + str(hesh_table[(index + pow(j, 2)) % len(hesh_table)][1]), 'Первичный ключ - ' + str(index), 'Вторичный ключ - ' + str(index + pow(j, 2) % len(hesh_table))
         else:
-            j += 1
+            if j == len(hesh_table):
+                return -1
+            else:
+                j += 1
 
 
 if __name__ == '__main__':
