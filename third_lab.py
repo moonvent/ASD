@@ -16,7 +16,7 @@ class MyApp(App):
     root_of_tree = None  # само дерево(бинарное)
 
     img = Image(
-        source='C:\\PyProj\\ASD\\test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
+        source='C:\\Users\\Keks\\Documents\\PythonProjects\\ASD\\test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
 
     def build(self):
 
