@@ -23,9 +23,14 @@ class MyApp(App):
                              size_hint=(1, .07),
                              )
         text_input_value = TextInput(hint_text='Введите сюда ключ:',
-                                     font_size=20)
+                                     font_size=12)
         text_input_data = TextInput(hint_text='Введите сюда значение:',
-                                    font_size=20)
+                                    font_size=12)
+        table = GridLayout(cols=4,  # хеш - таблица
+                           rows=6)
+        for i in ['Ключ', 'Значение', 'Первичный ключ', 'Вторичный ключ']:
+            table.add_widget(Button(text=i,
+                                    size_hint=(1, .3)))
 
         def add_in_table(instance):     # действия кнопки добавить
             if text_input_data.text == '' or text_input_value.text == '':   # если какое-то поле пусто
@@ -37,23 +42,40 @@ class MyApp(App):
                     return
             else:   # если поля заполненны добавляем в таблицу
                 result = hesh_lib.add_in_table(text_input_value.text, text_input_data.text)
-                if result is True:
+                if result[4] is True:
                     label_of_log.color = [0, 1, 0, 1]
                     label_of_log.text = 'Элемент добавлен'
+                    for i in range(4):
+                        table.add_widget(TextInput(text=str(result[i]),
+                                                   readonly=True,
+                                                   size=(1, .1)))
                 else:
                     label_of_log.color = [1, 0, 0, 1]
                     label_of_log.text = result
 
         button_to_add = Button(text='Добавить',
-                               font_size=20,
+                               font_size=15,
                                on_press=add_in_table)
+
+        def find_in_table(instance):
+            pass
+
+        button_to_find = Button(text='Найти',
+                                font_size=15,
+                                on_press=find_in_table)
+        text_input_find = TextInput(hint_text='Введите нужный ключ:',
+                                    font_size=12)
+
         toolbar.add_widget(text_input_value)
         toolbar.add_widget(text_input_data)
         toolbar.add_widget(button_to_add)
-        table = GridLayout(cols=4,  # хеш - таблица
-                           rows=5)
+        toolbar.add_widget(text_input_find)
+        toolbar.add_widget(button_to_find)
+
         main_bl.add_widget(toolbar)
+
         main_bl.add_widget(table)
+
         main_bl.add_widget(label_of_log)
         return main_bl
 

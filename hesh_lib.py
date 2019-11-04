@@ -15,16 +15,16 @@ def add_in_table(value, data):
         return 'Таблица заполненна'
     key = hesh_func(value)
     if hesh_table[key] == '--':
-        hesh_table[key] = data
+        hesh_table[key] = (value, data)
         print('Исходные данные - ', value, ';\nИндекс - ', key, ';\nДанные по этому ключу - ', data, '\n====================')
-        return True
+        return value, data, key, key, True
     else:   # если случилась коллизия, генерируем новый индекс для вставки в массив
         j = 1
         while True:
             if hesh_table[(key + pow(j, 2)) % len(hesh_table)] == '--':
                 print('Исходные данные - ',  value, ';\nИндекс - ', (key + pow(j, 2)) % len(hesh_table), ';\nДанные по этому ключу - ', data, '\n====================')
-                hesh_table[(key + pow(j, 2)) % len(hesh_table)] = data
-                return True
+                hesh_table[(key + pow(j, 2)) % len(hesh_table)] = (value, data)
+                return value, data, key, (key + pow(j, 2)) % len(hesh_table), True
             else:
                 if j == len(hesh_table):
                     return 'Элемент некуда сувать'
