@@ -29,7 +29,7 @@ class MyApp(App):
                                     font_size=12,
                                     multiline=False)
         table = GridLayout(cols=4,  # хеш - таблица
-                           rows=6)
+                           rows=20)
         for i in ['Ключ', 'Значение', 'Первичный ключ', 'Вторичный ключ']:
             table.add_widget(Button(text=i,
                                     size_hint=(1, .3)))
@@ -70,7 +70,7 @@ class MyApp(App):
                 text_input_find.hint_text = 'Введите нужный ключ:'
                 label_of_log.text = ''
                 for i in result:
-                    label_of_log.text += i + ' '
+                    label_of_log.text += 'Ключ - ' + i[0] + '; Значение - ' + i[1] + '; '
 
         button_to_find = Button(text='Найти',
                                 font_size=15,
@@ -100,4 +100,7 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    MyApp().run()
+    try:
+        MyApp().run()
+    except:
+        input()
