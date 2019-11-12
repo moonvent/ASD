@@ -25,7 +25,7 @@ class MyApp(App):
         bl_for_tree = BoxLayout(orientation='vertical')  # бокс лайаут для картинки дерева
 
         # =====================================================================================
-
+        label = Label(text='Тут будет результат обхода / задачи')  # сюда будут выводится результаты обхода
         def add(instance):  # функция на добавление элемента в дерево, рисунок
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
                 float(ti.text)  # работаем с инт , если что менять тут и в TextInput
@@ -69,28 +69,31 @@ class MyApp(App):
 
         def task(instance):     # ЗАДАНИЕ ПО ВАРИАНТУ
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
-                float(ti1.text)  # работаем с инт , если что менять тут и в TextInput
+                A = float(ti1.text)  # работаем с инт , если что менять тут и в TextInput
             except ValueError:
                 ti1.text = ''
                 ti1.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
                 ti1.hint_text_color = [1, 0, 0, 1]
                 return
 
-            value = ti1.text
+            try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
+                B = float(ti2.text)  # работаем с инт , если что менять тут и в TextInput
+            except ValueError:
+                ti2.text = ''
+                ti2.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
+                ti2.hint_text_color = [1, 0, 0, 1]
+                return
             ti1.text = ''
             ti1.hint_text_color = [1, 0, 1, 1]
             ti1.font_size = 16
-            ti1.hint_text = 'Число принято,\nэлемент удален.'
-            if self.root_of_tree.remove_node(float(value), None) is False:
-                ti1.hint_text_color = [1, 0, 0, 1]
-                ti1.font_size = 12
-                ti1.hint_text = 'Нельзя удалить корень,или узел\nу которого НЕТ дочернего.'
-                return
+            ti1.hint_text = 'Число принято, смотрите вниз.'
+            ti2.text = ''
+            ti2.hint_text_color = [1, 0, 1, 1]
+            ti2.font_size = 16
+            ti2.hint_text = 'Число принято, смотрите вниз.'
+            label.text, label.color = self.root_of_tree.test_find(A, B)
 
-            bl_for_tree.clear_widgets()  # чистим вывод для дерева
 
-            self.img.reload()
-            bl_for_tree.add_widget(self.img)
 
         # РАБОЧАЯ СРЕДА (лайауты)
 
@@ -103,7 +106,6 @@ class MyApp(App):
                              size_hint=(1, .1))
         bl_full_control.add_widget(control_bl)
         bl_full_control.add_widget(order_bl)
-        label = Label(text='Тут будет результат обхода')  # сюда будут выводится результаты обхода
         order_bl.add_widget(label)
 
         def pre_order(instance):
@@ -135,12 +137,17 @@ class MyApp(App):
         control_bl.add_widget(ti)
         control_bl.add_widget(Button(text='Добавить',
                                      on_press=add))
-        ti1 = TextInput(hint_text='Введите элемент который\nхотите удалить:',
+        ti1 = TextInput(hint_text='Введите A:',
                         multiline=False,  # для рабочего энтера
                         input_filter='float',  # автопроверка на инт))
-                        on_text_validate=task,  # при нажатии на энтер элемент добавляется
+                        )
+
+        ti2 = TextInput(hint_text='Введите B:',
+                        multiline=False,  # для рабочего энтера
+                        input_filter='float',  # автопроверка на инт))
                         )
         control_bl.add_widget(ti1)
+        control_bl.add_widget(ti2)
         control_bl.add_widget(Button(text='Задача',
                                      on_press=task))
         bl.add_widget(bl_full_control)

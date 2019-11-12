@@ -3,7 +3,7 @@ import os
 
 os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'  # для грапхвиза, его надо скачать
 
-counter, pre_minimum, minimun = 0, 0, 0
+marker = False
 
 
 class Graph:
@@ -74,6 +74,7 @@ class Graph:
 
 class BinaryTree:
     g = Graph()
+    where = 0
 
     def __init__(self, value):  # конструктор
         self.value = value  # основное значение
@@ -133,13 +134,39 @@ class BinaryTree:
         else:
             return self.value
 
-    def find_node(self, value):  # поиск по дереву, для того чтоб не вставлять одинаковые значения
+    def find_node(self, value, where):  # поиск по дереву, для того чтоб не вставлять одинаковые значения
+        if self.value == where:
+            global marker
+            marker = True
         if value < self.value and self.left_child:
-            return self.left_child.find_node(value)
+            return self.left_child.find_node(value, where)
         if value > self.value and self.right_child:
-            return self.right_child.find_node(value)
+            return self.right_child.find_node(value, where)
         return value == self.value
+
+    def test_find(self, where, what):
+        if self.find_node(where, where) is False:
+            return 'Элемента A не найдено', [1, 0, 0, 1]
+        if self.find_node(what, where) is False:
+            return 'Элемента B не найдено', [1, 0, 0, 1]
+        global marker
+        marker = False
+        self.where = where
+        self.find_node(what, where)
+        if marker:
+            return 'Элемент присутствует в данной ветке', [0, 1, 0, 1]
+        else:
+            return 'Элемент отсутствует в данной ветке', [1, 0, 0, 1]
 
 
 if __name__ == '__main__':
-    pass
+    b = BinaryTree(1)
+    b.insert_node(2)
+    b.insert_node(3)
+    b.insert_node(4)
+    b.insert_node(1.5)
+    b.insert_node(1.4)
+    b.insert_node(1.6)
+    print(b.pre_order([]))
+    print(b.test_find(1.5, 4))
+
