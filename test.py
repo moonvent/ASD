@@ -6,7 +6,7 @@ os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'  #
 marker = False
 
 
-class Graph:
+class Graph:    # рисовалка графа, именно самой его картинки в меню
     g = graphviz.Graph(format='png')
     counter = -1
     dict_of_nodes = {}
@@ -21,7 +21,7 @@ class Graph:
     def sorts(self, x):
         return x.find('label')
 
-    def add_node(self, value, parent):
+    def add_node(self, value, parent):  # добавление в граф(картинка)
         code_of_node = self.reformat()
         if parent is not None and float(value) >= float(parent):
             self.g.node(self.reformat_for_invis(), '', style='invis')
@@ -59,10 +59,10 @@ class Graph:
         self.clear_graph()
         self.g.render('test-output/round-table.gv')     # переписываем граф
 
-    def print_graph(self):
+    def print_graph(self):  # вывод графа вообще
         self.g.render('test-output/round-table.gv')
 
-    def clear_graph(self):
+    def clear_graph(self):  # для вывода более менее красиво графа
         for i in self.g.body:
             if i.find(' [label="" style=invis]') > -1:  # нашли инвизный узел
                 for j in self.g.body:
@@ -72,7 +72,7 @@ class Graph:
                     self.g.body.remove(i)
 
 
-class BinaryTree:
+class BinaryTree:   # само бинарное дерево
     g = Graph()
     where = 0
 
@@ -135,7 +135,7 @@ class BinaryTree:
             return self.value
 
     def find_node(self, value, where):  # поиск по дереву, для того чтоб не вставлять одинаковые значения
-        if self.value == where:
+        if self.value == where:  # ищем элемент Б, попутно чекая какие узлы мы проходим, если проходим A то флажок ставим на тру
             global marker
             marker = True
         if value < self.value and self.left_child:
@@ -144,22 +144,22 @@ class BinaryTree:
             return self.right_child.find_node(value, where)
         return value == self.value
 
-    def test_find(self, where, what):
-        if self.find_node(where, where) is False:
+    def test_find(self, where, what):   # функция задачка, поиск элемента в ветке A (where) элемента B (what)
+        if self.find_node(where, where) is False:   # проверяем есть ли A вообще
             return 'Элемента A не найдено', [1, 0, 0, 1]
-        if self.find_node(what, where) is False:
+        if self.find_node(what, where) is False:   # проверяем есть ли B вообще
             return 'Элемента B не найдено', [1, 0, 0, 1]
-        global marker
-        marker = False
+        global marker      # обращаемся к глоабльной переменной флажку
+        marker = False  # ставим её фалс, тип элемент по умолчанию не найден
         self.where = where
-        self.find_node(what, where)
+        self.find_node(what, where)  # ищем элемент Б, попутно чекая какие узлы мы проходим, если проходим A то флажок ставим на тру
         if marker:
-            return 'Элемент присутствует в данной ветке', [0, 1, 0, 1]
+            return 'Элемент присутствует в данной ветке', [0, 1, 0, 1]  # если нашли выводим зеленый цвет и надпись
         else:
-            return 'Элемент отсутствует в данной ветке', [1, 0, 0, 1]
+            return 'Элемент отсутствует в данной ветке', [1, 0, 0, 1]  # если не нашли выводим красный цвет и надпись
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # сюда не зайдет , так как это не скрипт по умолчанию
     b = BinaryTree(1)
     b.insert_node(2)
     b.insert_node(3)
