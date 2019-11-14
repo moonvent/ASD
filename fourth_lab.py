@@ -32,7 +32,7 @@ class MyApp(App):
                            rows=20)
         for i in ['Ключ', 'Значение', 'Первичный ключ', 'Вторичный ключ']:
             table.add_widget(Button(text=i,
-                                    size_hint=(1, .3)))
+                                    size_hint=(1, .2)))
 
         def add_in_table(instance):     # действия кнопки добавить
             if text_input_data.text == '' or text_input_value.text == '':   # если какое-то поле пусто
@@ -50,7 +50,7 @@ class MyApp(App):
                     for i in range(4):
                         table.add_widget(TextInput(text=str(result[i]),
                                                    readonly=True,
-                                                   size=(1, .1)))
+                                                   size_hint=(1, .1)))
                 else:
                     label_of_log.color = [1, 0, 0, 1]
                     label_of_log.text = result

@@ -16,7 +16,7 @@ class MyApp(App):
     root_of_tree = None  # само дерево(бинарное)
 
     img = Image(
-        source='C:\\Users\\Keks\\Documents\\PythonProjects\\ASD\\test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
+        source='test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
 
     def build(self):
 
@@ -26,6 +26,7 @@ class MyApp(App):
 
         # =====================================================================================
         label = Label(text='Тут будет результат обхода / задачи')  # сюда будут выводится результаты обхода
+
         def add(instance):  # функция на добавление элемента в дерево, рисунок
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
                 float(ti.text)  # работаем с инт , если что менять тут и в TextInput
@@ -58,6 +59,11 @@ class MyApp(App):
                 bl_for_tree.add_widget(self.img)
                 return
             else:
+                if self.root_of_tree.find_dublicate(float(value)) is True:  # проверка на дубликат
+                    ti.text = ''
+                    ti.hint_text = 'ДУБЛИКАТ'
+                    ti.hint_text_color = [1, 0, 0, 1]
+                    return
                 self.root_of_tree.insert_node(value)  # вставляем в дерево новый узел
 
             bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
@@ -156,4 +162,7 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    MyApp().run()
+    try:
+        MyApp().run()
+    except:
+        input()

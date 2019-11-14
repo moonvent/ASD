@@ -134,6 +134,13 @@ class BinaryTree:   # само бинарное дерево
         else:
             return self.value
 
+    def find_dublicate(self, value):  # поиск по дереву, для того чтоб не вставлять одинаковые значения
+        if value < self.value and self.left_child:
+            return self.left_child.find_dublicate(value)
+        if value > self.value and self.right_child:
+            return self.right_child.find_dublicate(value)
+        return value == self.value
+
     def find_node(self, value, where):  # поиск по дереву, для того чтоб не вставлять одинаковые значения
         if self.value == where:  # ищем элемент Б, попутно чекая какие узлы мы проходим, если проходим A то флажок ставим на тру
             global marker
