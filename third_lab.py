@@ -53,8 +53,6 @@ class MyApp(App):
                 self.root_of_tree = BinaryTree(value)
                 self.root_of_tree.g.add_node(str(value), None)
                 self.root_of_tree.g.print_graph()
-                bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
-
                 self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
                 bl_for_tree.add_widget(self.img)
                 return
@@ -66,10 +64,7 @@ class MyApp(App):
                     return
                 self.root_of_tree.insert_node(value)  # вставляем в дерево новый узел
 
-            bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
-
             self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
-            bl_for_tree.add_widget(self.img)
 
         # =============================================================================
 
