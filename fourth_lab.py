@@ -29,10 +29,10 @@ class MyApp(App):
                                     font_size=12,
                                     multiline=False)
         table = GridLayout(cols=4,  # хеш - таблица
-                           rows=20)
-        for i in ['Ключ', 'Значение', 'Первичный ключ', 'Вторичный ключ']:
+                           rows=6)
+        for i in ['Ключ', 'Значение', 'Рез-тат хеш-функции', 'Индекс в массиве']:
             table.add_widget(Button(text=i,
-                                    size_hint=(1, .2)))
+                                    size_hint=(1, .3)))
 
         def add_in_table(instance):     # действия кнопки добавить
             if text_input_data.text == '' or text_input_value.text == '':   # если какое-то поле пусто
@@ -50,7 +50,7 @@ class MyApp(App):
                     for i in range(4):
                         table.add_widget(TextInput(text=str(result[i]),
                                                    readonly=True,
-                                                   size_hint=(1, .1)))
+                                                   size=(1, .1)))
                 else:
                     label_of_log.color = [1, 0, 0, 1]
                     label_of_log.text = result
@@ -66,18 +66,21 @@ class MyApp(App):
             result = hesh_lib.find_in_table(text_input_find.text)
             if result == -1:
                 text_input_find.hint_text = 'Элемент не найден.'
+                text_input_find.hint_text_color = [1, 0, 0, 1]
+                text_input_find.text = ''
             else:
                 text_input_find.hint_text = 'Введите нужный ключ:'
                 label_of_log.text = ''
                 for i in result:
-                    label_of_log.text += 'Ключ - ' + i[0] + '; Значение - ' + i[1] + '; '
+                    label_of_log.text += i + ' '
 
         button_to_find = Button(text='Найти',
                                 font_size=15,
                                 on_press=find_in_table)
         text_input_find = TextInput(hint_text='Введите нужный ключ:',
                                     font_size=12,
-                                    multiline=False)
+                                    multiline=False,
+                                    on_text_validate=find_in_table)
 
         toolbar.add_widget(text_input_value)
         toolbar.add_widget(text_input_data)
@@ -100,7 +103,4 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    try:
-        MyApp().run()
-    except:
-        input()
+    MyApp().run()
