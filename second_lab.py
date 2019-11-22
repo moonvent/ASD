@@ -107,18 +107,21 @@ class MyApp(App, LinkedList):
         fti = TextInput(hint_text="Какой элемент:>",
                                   multiline=False,
                                   size=(100, 100),
-                                  size_hint=(1, .07)
+                                  size_hint=(1, .07),
+                                  input_filter='float',
                                   )
         bl3.add_widget(fti)
         sti = TextInput(hint_text="На какой элемент:>",
                                   multiline=False,
                                   size=(100, 100),
-                                  size_hint=(1, .07))
+                                  size_hint=(1, .07),
+                                  input_filter='float',)
         bl3.add_widget(sti)
 
         ti = TextInput(hint_text='Введите элемент списка:',
                        padding=[10, 10, 10, 10],
-                       multiline=False)
+                       multiline=False,
+                       input_filter='float',)
         bl2.add_widget(ti)
 
         def add_elem(instance):  # добавляем элемент с попутным выводом на экран

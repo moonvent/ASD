@@ -16,7 +16,7 @@ class MyApp(App):
     root_of_tree = None  # само дерево(бинарное)
 
     img = Image(
-        source='test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
+        source='C:\\Users\\Keks\\Documents\\PythonProjects\\ASD\\test-5output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
 
     def build(self):
 
@@ -25,7 +25,6 @@ class MyApp(App):
         bl_for_tree = BoxLayout(orientation='vertical')  # бокс лайаут для картинки дерева
 
         # =====================================================================================
-        label = Label(text='Тут будет результат обхода / задачи')  # сюда будут выводится результаты обхода
 
         def add(instance):  # функция на добавление элемента в дерево, рисунок
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
@@ -53,48 +52,45 @@ class MyApp(App):
                 self.root_of_tree = BinaryTree(value)
                 self.root_of_tree.g.add_node(str(value), None)
                 self.root_of_tree.g.print_graph()
+                bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
+
                 self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
                 bl_for_tree.add_widget(self.img)
                 return
             else:
-                if self.root_of_tree.find_dublicate(float(value)) is True:  # проверка на дубликат
-                    ti.text = ''
-                    ti.hint_text = 'ДУБЛИКАТ'
-                    ti.hint_text_color = [1, 0, 0, 1]
-                    return
                 self.root_of_tree.insert_node(value)  # вставляем в дерево новый узел
 
+            bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
+
             self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
+            bl_for_tree.add_widget(self.img)
 
         # =============================================================================
 
         def task(instance):     # ЗАДАНИЕ ПО ВАРИАНТУ
             try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
-                A = float(ti1.text)  # работаем с инт , если что менять тут и в TextInput
+                float(ti1.text)  # работаем с инт , если что менять тут и в TextInput
             except ValueError:
                 ti1.text = ''
                 ti1.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
                 ti1.hint_text_color = [1, 0, 0, 1]
                 return
 
-            try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
-                B = float(ti2.text)  # работаем с инт , если что менять тут и в TextInput
-            except ValueError:
-                ti2.text = ''
-                ti2.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
-                ti2.hint_text_color = [1, 0, 0, 1]
-                return
+            value = ti1.text
             ti1.text = ''
             ti1.hint_text_color = [1, 0, 1, 1]
             ti1.font_size = 16
-            ti1.hint_text = 'Число принято, смотрите вниз.'
-            ti2.text = ''
-            ti2.hint_text_color = [1, 0, 1, 1]
-            ti2.font_size = 16
-            ti2.hint_text = 'Число принято, смотрите вниз.'
-            label.text, label.color = self.root_of_tree.test_find(A, B)
+            ti1.hint_text = 'Число принято,\nэлемент удален.'
+            if self.root_of_tree.remove_node(float(value), None) is False:
+                ti1.hint_text_color = [1, 0, 0, 1]
+                ti1.font_size = 12
+                ti1.hint_text = 'Нельзя удалить корень,или узел\nу которого НЕТ дочернего.'
+                return
 
+            bl_for_tree.clear_widgets()  # чистим вывод для дерева
 
+            self.img.reload()
+            bl_for_tree.add_widget(self.img)
 
         # РАБОЧАЯ СРЕДА (лайауты)
 
@@ -107,6 +103,7 @@ class MyApp(App):
                              size_hint=(1, .1))
         bl_full_control.add_widget(control_bl)
         bl_full_control.add_widget(order_bl)
+        label = Label(text='Тут будет результат обхода')  # сюда будут выводится результаты обхода
         order_bl.add_widget(label)
 
         def pre_order(instance):
@@ -138,17 +135,12 @@ class MyApp(App):
         control_bl.add_widget(ti)
         control_bl.add_widget(Button(text='Добавить',
                                      on_press=add))
-        ti1 = TextInput(hint_text='Введите A:',
+        ti1 = TextInput(hint_text='Введите элемент который\nхотите удалить:',
                         multiline=False,  # для рабочего энтера
                         input_filter='float',  # автопроверка на инт))
-                        )
-
-        ti2 = TextInput(hint_text='Введите B:',
-                        multiline=False,  # для рабочего энтера
-                        input_filter='float',  # автопроверка на инт))
+                        on_text_validate=task,  # при нажатии на энтер элемент добавляется
                         )
         control_bl.add_widget(ti1)
-        control_bl.add_widget(ti2)
         control_bl.add_widget(Button(text='Задача',
                                      on_press=task))
         bl.add_widget(bl_full_control)
@@ -157,7 +149,4 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    try:
-        MyApp().run()
-    except:
-        input()
+    MyApp().run()
