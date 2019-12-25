@@ -1,8 +1,7 @@
 import graphviz
 import os
 
-os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'  # для грапхвиза, его надо скачать
-
+os.environ["PATH"] += os.pathsep + 'release\\bin'  # для грапхвиза, его надо скачать
 counter, pre_minimum, minimun = 0, 0, 0
 
 
