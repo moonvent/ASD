@@ -2,12 +2,7 @@ hesh_table = ['--'] * 5     # создаем массив, нашу будущу
 
 
 def hesh_func(value):   # хуш-функция
-    summa = 0
-    for i in enumerate(value):
-        if (i[0] + 1) % 2 == 0:     # по четному индексу состовляем ключ
-            summa += ord(i[1])
-    else:
-        return (summa * len(value)) % len(hesh_table)   # возвращаем индекс в массиве
+    return (ord(value[0]) + ord(value[-1])) * len(value) % len(hesh_table)
 
 
 def add_in_table(value, data):
@@ -20,7 +15,7 @@ def add_in_table(value, data):
     else:   # если случилась коллизия, генерируем новый индекс для вставки в массив
         j = 1
         while True:
-            if hesh_table[(key + j) % len(hesh_table)] == '--':
+            if hesh_table[(key + j) % len(hesh_table)] == '--':		# формула для решений коллизий
                 hesh_table[(key + j) % len(hesh_table)] = (value, data)
                 return value, data, key, (key + j) % len(hesh_table), True
             else:
@@ -37,7 +32,7 @@ def find_in_table(value):
     j = 1
     while True:
         if hesh_table[(index + j) % len(hesh_table)][0] == value:
-            return 'Ключ - ' + str(value), 'Значение - ' + str(hesh_table[(index + j) % len(hesh_table)][1]), 'Первичный ключ - ' + str(index), 'Вторичный ключ - ' + str(index + pow(j, 2) % len(hesh_table))
+            return 'Ключ - ' + str(value), 'Значение - ' + str(hesh_table[(index + j) % len(hesh_table)][1]), 'Первичный ключ - ' + str(index), 'Вторичный ключ - ' + str(index + j % len(hesh_table))
         else:
             if j == len(hesh_table):
                 return -1
