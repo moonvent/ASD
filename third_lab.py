@@ -1,12 +1,9 @@
-from kivy.clock import Clock
 from kivy.config import Config
-from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import Button  # кнопка
 from kivy.uix.textinput import TextInput  # поле для ввода
-from kivy.uix.widget import Widget
 from test import BinaryTree
 Config.set('graphics', 'height', 640)
 from kivy.app import App
@@ -16,7 +13,7 @@ class MyApp(App):
     root_of_tree = None  # само дерево(бинарное)
 
     img = Image(
-        source='C:\\Users\\Keks\\Documents\\PythonProjects\\ASD\\test-5output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
+        source='test-output\\round-table.gv.png')  # сам рисунок графа, и его путь, фраемвор сам грузит его в прогу
 
     def build(self):
 
@@ -51,12 +48,7 @@ class MyApp(App):
             if self.root_of_tree is None:  # если корня нет
                 self.root_of_tree = BinaryTree(value)
                 self.root_of_tree.g.add_node(str(value), None)
-                self.root_of_tree.g.print_graph()
-                bl_for_tree.clear_widgets()  # при успешном добавлении чистим изображние
 
-                self.img.reload()  # перезагружаем изображение, то есть старое затираем и новое грузим
-                bl_for_tree.add_widget(self.img)
-                return
             else:
                 self.root_of_tree.insert_node(value)  # вставляем в дерево новый узел
 
@@ -68,29 +60,7 @@ class MyApp(App):
         # =============================================================================
 
         def task(instance):     # ЗАДАНИЕ ПО ВАРИАНТУ
-            try:  # проверка на ввод числа (в TextInput уже стоит проверка, но она не пашет на пустое значение)
-                float(ti1.text)  # работаем с инт , если что менять тут и в TextInput
-            except ValueError:
-                ti1.text = ''
-                ti1.hint_text = 'ВВЕДИТЕ ЦЕЛОЕ ЧИСЛО!!!'
-                ti1.hint_text_color = [1, 0, 0, 1]
-                return
-
-            value = ti1.text
-            ti1.text = ''
-            ti1.hint_text_color = [1, 0, 1, 1]
-            ti1.font_size = 16
-            ti1.hint_text = 'Число принято,\nэлемент удален.'
-            if self.root_of_tree.remove_node(float(value), None) is False:
-                ti1.hint_text_color = [1, 0, 0, 1]
-                ti1.font_size = 12
-                ti1.hint_text = 'Нельзя удалить корень,или узел\nу которого НЕТ дочернего.'
-                return
-
-            bl_for_tree.clear_widgets()  # чистим вывод для дерева
-
-            self.img.reload()
-            bl_for_tree.add_widget(self.img)
+            ti1.text = self.root_of_tree.task()
 
         # РАБОЧАЯ СРЕДА (лайауты)
 
@@ -107,7 +77,7 @@ class MyApp(App):
         order_bl.add_widget(label)
 
         def pre_order(instance):
-            label.text = str(self.root_of_tree.pre_order([]))
+            label.text = str(self.root_of_tree.pre_order([], 0, [0])[0])
 
         def in_order(instance):
             label.text = str(self.root_of_tree.in_order([]))
@@ -130,15 +100,12 @@ class MyApp(App):
                        input_filter='float',  # автопроверка на инт))
                        on_text_validate=add,  # при нажатии на энтер элемент добавляется
                        )
-        ti.focus = True
 
         control_bl.add_widget(ti)
         control_bl.add_widget(Button(text='Добавить',
                                      on_press=add))
-        ti1 = TextInput(hint_text='Введите элемент который\nхотите удалить:',
-                        multiline=False,  # для рабочего энтера
-                        input_filter='float',  # автопроверка на инт))
-                        on_text_validate=task,  # при нажатии на энтер элемент добавляется
+        ti1 = TextInput(hint_text='Тут будет сумма,\nвысота',
+                        readonly=True
                         )
         control_bl.add_widget(ti1)
         control_bl.add_widget(Button(text='Задача',
