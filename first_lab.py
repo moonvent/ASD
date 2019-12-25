@@ -89,11 +89,11 @@ class MyApp(App):   # класс создания главного окна
                     a = f.readline()
                     self.ls_of_labels[i].text = a[:a.find('\n')]
 
-        gl.add_widget(Button(text='Страны(В)',
+        gl.add_widget(Button(text='Страны(Ш)',
                              on_press=export))
-        gl.add_widget(Button(text='Население(В)',
+        gl.add_widget(Button(text='Население(Ш)',
                              on_press=export))
-        gl.add_widget(Button(text='Бюджет(В)',
+        gl.add_widget(Button(text='Бюджет(Ш)',
                              on_press=export))
         gl.add_widget(Widget())
         gl.add_widget(Button(text='Переписать',
@@ -146,26 +146,6 @@ class MyApp(App):   # класс создания главного окна
                     for k in range(0, 3):   # покраска
                         self.ls_of_labels[i * 3 - 3 + k].background_color = self.ls_of_labels[i * 3 + k].background_color = [1, 1, 1, 1]
             self.left += 1
-        else:
-            self.x = 3
-
-    def sorting2(self):
-        for i in range(self.left, self.right):
-            for j in range(i + 1, self.right):
-                a, b = self.ls_of_labels[i * 3 + self.x].text, self.ls_of_labels[j * 3 + 3 + self.x].text   # для + читабельности
-                if self.x != 0:
-                    a, b = self.checker(a), self.checker(b)  # проверка на дибила х2
-                if a > b:
-                    for k in range(0, 3):   # покраска
-                        self.ls_of_labels[i * 3 + k].background_color = self.ls_of_labels[j * 3 + 3 + k].background_color = [1, 0, 0, 1]
-
-                    time.sleep(0.1)
-                    for k in range(0, 3):  # сама сортировка
-                        self.ls_of_labels[i * 3 + k].text, self.ls_of_labels[j * 3 + 3 + k].text = self.ls_of_labels[j * 3 + 3 + k].text, self.ls_of_labels[i * 3 + k].text
-
-                    time.sleep(0.1)
-                    for k in range(0, 3):   # покраска
-                        self.ls_of_labels[i * 3 + k].background_color = self.ls_of_labels[j * 3 + 3 + k].background_color = [1, 1, 1, 1]
         else:
             self.x = 3
 
