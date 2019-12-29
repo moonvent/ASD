@@ -26,7 +26,7 @@ class MyApp(App):
                                     multiline=False)
         table = GridLayout(cols=4,  # хеш - таблица
                            rows=6)
-        for i in ['Ключ', 'Значение', 'Рез-тат хеш-функции', 'Индекс в массиве']:
+        for i in ['Ключ', 'Значение', 'Рез-тат хеш-функции', 'Индекс в списке']:
             table.add_widget(Button(text=i,
                                     size_hint=(1, .3)))
 
