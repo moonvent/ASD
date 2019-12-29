@@ -153,7 +153,8 @@ class BinaryTree:
         return value == self.value
 
     def task(self):
-        return 'Сумма - ' + str(sum(self.pre_order([], 0, [0])[0])) + ';\nВысота - ' + str(self.pre_order([], 0, [0])[1]) + ';'
+        ls = [x for x in self.pre_order([], 0, [0])[0] if x >= 0]
+        return 'Сумма - ' + str(sum(ls)) + ';\nКоличество - ' + str(len(ls)) + ';'
 
 
 if __name__ == '__main__':
