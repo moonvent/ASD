@@ -1,13 +1,9 @@
-from kivy.clock import Clock
 from kivy.config import Config
-from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import Button  # кнопка
 from kivy.uix.textinput import TextInput  # поле для ввода
-from kivy.uix.widget import Widget
 Config.set('graphics', 'height', 640)
 from kivy.app import App
 import hesh_lib
@@ -72,7 +68,8 @@ class MyApp(App):
                 text_input_find.hint_text = 'Введите нужный ключ:'
                 label_of_log.text = ''
                 for i in result:
-                    label_of_log.text += i + ' '
+                    if i[0] == text_input_find.text:
+                        label_of_log.text += 'Результат поиска по ключу - ' + text_input_find.text + ': ' + i[1] + ' '
 
         button_to_find = Button(text='Найти',
                                 font_size=15,
